@@ -17,12 +17,8 @@ COPY rcvr.py /rcvr.py
 COPY wrtr.py /wrtr.py
 COPY loadenv.py /loadenv.py
 COPY docker/entrypoint.sh /entrypoint.sh
-
-# Copy hello-cron file to the cron.d directory
-COPY docker/rcvr-cron /etc/cron.d/rcvr-cron
  
 # Give execution rights scripts
-RUN chmod 0644 /etc/cron.d/rcvr-cron
 RUN chmod +x /entrypoint.sh
  
 # Create the log file to be able to run tail
