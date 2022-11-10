@@ -1,3 +1,10 @@
+# Data files
+*.gz
+*.zip
+
+#virtual env
+mypy38/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
