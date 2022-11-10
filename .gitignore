@@ -1,3 +1,6 @@
+# Private files
+docker/my_envVars
+
 # Data files
 *.gz
 *.zip
