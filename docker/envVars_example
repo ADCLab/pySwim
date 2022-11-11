@@ -4,6 +4,7 @@ QUEUE_NAME=bobjones.swimview.com.FDPS.fdsfdsat43-fdsat3saf-32fdsfsda-3dsaf.OUT
 CONNECTION_USERNAME=bobjones.swimview.com
 CONNECTION_PASSWORD=mypasswordhere
 RUNTIME=1
+CRONSTRING=* * * * *
 
 # Output
 OUTPUT_METHOD=file, s3
