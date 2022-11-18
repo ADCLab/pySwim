@@ -33,17 +33,18 @@ class Recvr(MessagingHandler):
         self.fileout.close()
         event.container.stop()        
         print('Connection Terminated')
-        s3conn_options={'endpoint':'%s:%d'%(self.opts.output_s3_host,self.opts.output_s3_port),
-                   'access_key': self.opts.output_s3_access_key,
-                   'secret_key': self.opts.output_s3_secret_key,
-                   'secure': self.opts.output_s3_secure}
-        if self.opts.output_s3_region not in [None,'']:
-            s3conn_options['region']=self.opts.output_s3_region
-        else:
-            print('no region')
-        bucket_options={'bucket_name':self.opts.output_s3_bucket_name,'make_bucket':self.opts.output_s3_make_bucket}
-    
-        toS3(s3conn_options,bucket_options,self.fileout.filepath)
+        if 's3' in self.opts.output_method:
+            s3conn_options={'endpoint':'%s:%d'%(self.opts.output_s3_host,self.opts.output_s3_port),
+                       'access_key': self.opts.output_s3_access_key,
+                       'secret_key': self.opts.output_s3_secret_key,
+                       'secure': self.opts.output_s3_secure}
+            if self.opts.output_s3_region not in [None,'']:
+                s3conn_options['region']=self.opts.output_s3_region
+            else:
+                print('no region')
+            bucket_options={'bucket_name':self.opts.output_s3_bucket_name,'make_bucket':self.opts.output_s3_make_bucket}
+        
+            toS3(s3conn_options,bucket_options,self.fileout.filepath)
         self.fileout.cleanup()
 
     def on_message(self, event):
