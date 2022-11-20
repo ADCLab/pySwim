@@ -4,7 +4,7 @@ from proton.handlers import MessagingHandler
 import time
 from loadenv import Options
 from wrtr import toFile, toS3
-
+import sys
 
 class Recvr(MessagingHandler):
     def __init__(self, opts):
@@ -60,15 +60,25 @@ class Recvr(MessagingHandler):
 
 # Uncomment line below if running script directly.
 # opts = Options(configFile='conVars.cfg')
-opts = Options()
 
-try:
-    container = Container(Recvr(opts))
-    container.run()
-except KeyboardInterrupt:
+
+def main(SWIMconfigPath=None):
+    opts = Options(SWIMconfigPath)    
+    try:
+        container = Container(Recvr(opts))
+        container.run()
+    except KeyboardInterrupt:
+        container.stop()
+        print()
     container.stop()
-    print()
-container.stop()
+
+if __name__ == "__main__":
+    if len(sys.argv)==1:
+        main()
+    else:
+        main(sys.argv[1])
+
+
 
 
 
