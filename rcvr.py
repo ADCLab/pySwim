@@ -3,22 +3,24 @@ from proton.reactor import Container
 from proton.handlers import MessagingHandler
 import time
 from loadenv import Options
-from wrtr import toFile, toS3
+from wrtr import toFile, toS3, makeFileName
 import sys
+import json
+from io import StringIO  # Python 3.x
+import gzip
+
+
 
 class Recvr(MessagingHandler):
     def __init__(self, opts):
         super(Recvr, self).__init__()
         # TIMING SETTINGS
         self.startTime=time.time()
-        self.opts=opts        
-
+        self.opts=opts
+        self.messages=[]        
+        self.filename=makeFileName(self.opts.output_prefix,self.startTime,'.njson')
+        
     def on_reactor_init(self, event):  
-        self.fileout=toFile(fdOut=self.opts.output_file_folder,
-                            prefix=self.opts.output_prefix,
-                            compress=self.opts.output_compress,
-                            deletetmpfile='file' not in self.opts.output_method)
-
         self.container = event.reactor
         self.container.schedule(self.opts.runtime, self)
         conn = event.container.connect(url=self.opts.amqp_connection_url, 
@@ -30,9 +32,20 @@ class Recvr(MessagingHandler):
             print('Connection Establish')
 
     def on_timer_task(self, event):
-        self.fileout.close()
         event.container.stop()        
         print('Connection Terminated')
+        self.messages='\n'.join(self.messages)
+        
+        if 'file' in self.opts.output_method:
+            filepath=toFile(messages=self.messages,
+                   fdOut=self.opts.output_file_folder,
+                   filename=self.filename,
+                   compress=self.opts.output_compress)
+            self.messages=None
+        else:
+            filepath=None
+
+
         if 's3' in self.opts.output_method:
             s3conn_options={'endpoint':'%s:%d'%(self.opts.output_s3_host,self.opts.output_s3_port),
                        'access_key': self.opts.output_s3_access_key,
@@ -43,12 +56,15 @@ class Recvr(MessagingHandler):
             else:
                 print('no region')
             bucket_options={'bucket_name':self.opts.output_s3_bucket_name,'make_bucket':self.opts.output_s3_make_bucket}
-        
-            toS3(s3conn_options,bucket_options,self.fileout.filepath)
-        self.fileout.cleanup()
+            toS3(s3conn_options=s3conn_options,
+                 bucket_options=bucket_options,
+                 filename=self.filename,
+                 messages=self.messages,
+                 filepath=filepath,
+                 compress=self.opts.output_compress)
 
     def on_message(self, event):
-        self.fileout.proc(event.message)
+        self.messages.append(json.dumps(dict({'properties':event.message.properties,'body':event.message.body})))
 
     # the on_transport_error event catches socket and authentication failures
     def on_transport_error(self, event):
@@ -57,10 +73,6 @@ class Recvr(MessagingHandler):
 
     def on_disconnected(self, event):
         print("Disconnected")
-
-# Uncomment line below if running script directly.
-# opts = Options(configFile='conVars.cfg')
-
 
 def main(SWIMconfigPath='my_configVars.cfg'):
     opts = Options(SWIMconfigPath)  
