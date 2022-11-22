@@ -16,7 +16,7 @@ def makeFileName(prefix,msgBlockStart,postfix):
         return prefix + '_' + str(floor(msgBlockStart)) + postfix
 
 class toFile():
-    def __init__(self,fdOut,prefix,compress=True,deletetmpfile=False): 
+    def __init__(self,fdOut,prefix,compress=True,deletetmpfile=True): 
             msgBlockStart=time.time()
             self.filepath=os.path.join(fdOut,makeFileName(prefix,msgBlockStart,'.njson'))
             self.fout=open(self.filepath,'w')   
@@ -35,6 +35,12 @@ class toFile():
         if self.deletetmpfile:
             print('Deleting local tmp files')
             check_call(['rm', rm_file])            
+
+    # def delzip(self):
+    #     rm_file=self.filepath
+    #     print('Deleting zip file')
+    #     check_call(['rm', rm_file])      
+
             
     def proc(self,message):
         self.fout.write(json.dumps(dict({'properties':message.properties,'body':message.body}))+'\n')

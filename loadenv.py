@@ -77,18 +77,19 @@ class Options(object):
         
         
         if configFile is not None:
-            config = configparser.ConfigParser()
-            config.read(configFile)
-            opt=config['options']    
+            load_env_file(configFile)
+            # config = configparser.ConfigParser()
+            # config.read(configFile)
+            # opt=config['options']    
             
         for cKey in optDict.keys():
-            if configFile is None:
-                nVal=os.environ.get(cKey.upper())
-            else:
-                if cKey in opt.keys():
-                    nVal=opt[cKey]
-                else:
-                    nVal=None
+            # if configFile is None:
+            nVal=os.environ.get(cKey.upper())
+            # else:
+            #     if cKey in opt.keys():
+            #         nVal=opt[cKey]
+            #     else:
+            #         nVal=None
 
             if cKey=='output_method':
                 nVals=nVal.split(',')

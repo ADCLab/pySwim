@@ -62,8 +62,8 @@ class Recvr(MessagingHandler):
 # opts = Options(configFile='conVars.cfg')
 
 
-def main(SWIMconfigPath=None):
-    opts = Options(SWIMconfigPath)    
+def main(SWIMconfigPath='my_configVars.cfg'):
+    opts = Options(SWIMconfigPath)  
     try:
         container = Container(Recvr(opts))
         container.run()
