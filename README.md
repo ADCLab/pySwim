@@ -1,6 +1,8 @@
 # pySWIM
 This small software package can be used to listen, capture, and store FAA SWIM data, either to file or to an S3 bucket.  As implemented, the package does not perform any additional filtering or processing of the data, however, you are welcome and encouraged to adjust this code to your needs.  Much of the code provided here is based on the following github repo: https://github.com/SolaceSamples/solace-samples-amqp-qpid-proton-python/blob/master/README.md  
 
+For this to work, AMQP needs to be enabled by the FAA on your SWIM account. To request this, you need to open a support request on The [SWIFT Portal Support](https://support.swim.faa.gov/hc/en-us/requests/new).
+
 ## Requirements & Deployment
 Requirements of this package depend on deployment: (1) standard execution as a script; or (2) execution within a docker container.
 
