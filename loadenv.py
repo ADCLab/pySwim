@@ -1,7 +1,6 @@
 import os
-import configparser
 from datetime import datetime
-import os
+
 
 # Code below is adapted from
 # https://stackoverflow.com/questions/40216311/reading-in-environment-variables-from-an-environment-file

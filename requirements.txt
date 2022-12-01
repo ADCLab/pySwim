@@ -1,3 +1,2 @@
 python-qpid-proton
-configparser
 minio
