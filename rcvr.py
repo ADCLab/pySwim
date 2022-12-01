@@ -87,7 +87,7 @@ def main(SWIMconfigPath='my_configVars.cfg'):
     try:
         container = Container(Recvr(opts))
         container.run()
-    except KeyboardInterrupt:
+    except KeyboardInterrupt: 
         container.stop()
         print()
     container.stop()
