@@ -61,6 +61,7 @@ class Options(object):
               
               'output_method':(str,'file'),
               'output_prefix':(str,None),
+              'output_maxsize':(int,0),
               'output_compress':(bool,True),
               
               'output_file_folder':(str,'/data'),
@@ -78,18 +79,8 @@ class Options(object):
         
         if configFile is not None:
             load_env_file(configFile)
-            # config = configparser.ConfigParser()
-            # config.read(configFile)
-            # opt=config['options']    
-            
         for cKey in optDict.keys():
-            # if configFile is None:
             nVal=os.environ.get(cKey.upper())
-            # else:
-            #     if cKey in opt.keys():
-            #         nVal=opt[cKey]
-            #     else:
-            #         nVal=None
 
             if cKey=='output_method':
                 nVals=nVal.split(',')

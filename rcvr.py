@@ -8,7 +8,7 @@ import sys
 import json
 from io import StringIO  # Python 3.x
 import gzip
-
+from math import ceil
 
 
 class Recvr(MessagingHandler):
@@ -18,7 +18,6 @@ class Recvr(MessagingHandler):
         self.startTime=time.time()
         self.opts=opts
         self.messages=[]        
-        self.filename=makeFileName(self.opts.output_prefix,self.startTime,'.njson')
         
     def on_reactor_init(self, event):  
         self.container = event.reactor
@@ -34,34 +33,43 @@ class Recvr(MessagingHandler):
     def on_timer_task(self, event):
         event.container.stop()        
         print('Connection Terminated')
-        self.messages='\n'.join(self.messages)
-        
-        if 'file' in self.opts.output_method:
-            filepath=toFile(messages=self.messages,
-                   fdOut=self.opts.output_file_folder,
-                   filename=self.filename,
-                   compress=self.opts.output_compress)
-            self.messages=None
+        if self.opts.output_maxsize==0:
+            messageChunks=['\n'.join(self.messages)]
+            numChunks=['']
         else:
-            filepath=None
-
-
-        if 's3' in self.opts.output_method:
-            s3conn_options={'endpoint':'%s:%d'%(self.opts.output_s3_host,self.opts.output_s3_port),
-                       'access_key': self.opts.output_s3_access_key,
-                       'secret_key': self.opts.output_s3_secret_key,
-                       'secure': self.opts.output_s3_secure}
-            if self.opts.output_s3_region not in [None,'']:
-                s3conn_options['region']=self.opts.output_s3_region
+            totalSizeInMB=sum([sys.getsizeof(message) for message in self.messages])/1024/1024
+            numberOfFiles=ceil(totalSizeInMB/self.opts.output_maxsize)
+            numberOfMessagesPerFile=ceil(len(self.messages)/numberOfFiles)
+            messageChunks = ['\n'.join(self.messages[idx:idx + numberOfMessagesPerFile]) for idx in range(0, len(self.messages), numberOfMessagesPerFile)]
+            numChunks=['_part%02d'%x for x in range(len(messageChunks))]
+            
+        for messageChunk, numChunk in zip(messageChunks,numChunks):
+            filename=makeFileName(self.opts.output_prefix,self.startTime,numChunk+'.njson')
+            if 'file' in self.opts.output_method:
+                filepath=toFile(messages=messageChunk,
+                       fdOut=self.opts.output_file_folder,
+                       filename=filename,
+                       compress=self.opts.output_compress)
+                messageChunk=None
             else:
-                print('no region')
-            bucket_options={'bucket_name':self.opts.output_s3_bucket_name,'make_bucket':self.opts.output_s3_make_bucket}
-            toS3(s3conn_options=s3conn_options,
-                 bucket_options=bucket_options,
-                 filename=self.filename,
-                 messages=self.messages,
-                 filepath=filepath,
-                 compress=self.opts.output_compress)
+                filepath=None
+    
+    
+            if 's3' in self.opts.output_method:
+                s3conn_options={'endpoint':'%s:%d'%(self.opts.output_s3_host,self.opts.output_s3_port),
+                           'access_key': self.opts.output_s3_access_key,
+                           'secret_key': self.opts.output_s3_secret_key,
+                           'secure': self.opts.output_s3_secure}
+                if self.opts.output_s3_region not in [None,'']:
+                    s3conn_options['region']=self.opts.output_s3_region
+
+                bucket_options={'bucket_name':self.opts.output_s3_bucket_name,'make_bucket':self.opts.output_s3_make_bucket}
+                toS3(s3conn_options=s3conn_options,
+                     bucket_options=bucket_options,
+                     filename=filename,
+                     messages=messageChunk,
+                     filepath=filepath,
+                     compress=self.opts.output_compress)
 
     def on_message(self, event):
         self.messages.append(json.dumps(dict({'properties':event.message.properties,'body':event.message.body})))
