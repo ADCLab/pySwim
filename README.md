@@ -72,14 +72,14 @@ By default RUNTIME = 1 (minutes), with the cron job calling rcvr.py every minute
   In the cases of data heavy streams, or if the code based is expanded to include real-time processing, then multiple instances of this container can be deployed.  In the case of multiple the messages will only be consumed only once; each instance of the container will receive unique data.
   
   ## Bucket Naming Convention
-  The variable OUTPUT_S3_BUCKET_NAME can be set to create a new bucket based on the date (assuming OUTPUT_S3_MAKE_BUCKET=true).  For example, data can be stored in buckets for each day of the year: asde-x_010122,asde-x_010222, ... , asde-x_123122.  This is achieved by including the placeholders dd, mm, yy or yyyy in the variable that are replaced with the time formating strings %d, %m, %y and %Y;  make sure dd, mm, yy, and yyyy do not appear elsewhere in the bucket name.  Examples include:
-  * OUTPUT_S3_BUCKET_NAME = asde-x_mmddyy
-  * OUTPUT_S3_BUCKET_NAME = asde-x_mm-yyyyy
-  * OUTPUT_S3_BUCKET_NAME = asde-x_yy_onlyDFW
+  The variable OUTPUT_S3_BUCKET_NAME can be set to create a new bucket based on the date (assuming OUTPUT_S3_MAKE_BUCKET=true).  For example, data can be stored in buckets for each day of the year: asde-x-010122,asde-x-010222, ... , asde-x-123122.  This is achieved by including the placeholders dd, mm, yy or yyyy in the variable that are replaced with the time formating strings %d, %m, %y and %Y;  make sure dd, mm, yy, and yyyy do not appear elsewhere in the bucket name.  Examples include:
+  * OUTPUT_S3_BUCKET_NAME = asdex-mmddyy
+  * OUTPUT_S3_BUCKET_NAME = asdex-mm-yyyyy
+  * OUTPUT_S3_BUCKET_NAME = asdex-yy-onlyDFW
   * OUTPUT_S3_BUCKET_NAME = yyyy-etms
   * OUTPUT_S3_BUCKET_NAME = dd-mm-yyyy-etms
   
-  The dd, mm, yy, and yyyy placeholders can be located anywhere in the bucket name, in any order, and include additional separating charactors as desired.
+  The dd, mm, yy, and yyyy placeholders can be located anywhere in the bucket name, in any order, and include additional separating charactors as desired.  Note, for AWS S3 all characters must be lower case and only hyphens are permitted ( the underscore charactered is not permitted).
   
   
   
