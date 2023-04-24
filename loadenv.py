@@ -100,7 +100,7 @@ class Options(object):
             if 'dd' in dateformat:
                 dateformat=dateformat.replace('dd','%d')
             now = datetime.now()
-            self.output_s3_bucket_name=base_path +'-'+now.strftime(dateformat)
+            self.output_s3_bucket_name=base_path + now.strftime(dateformat)
             
         
         
