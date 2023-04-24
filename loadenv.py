@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 
-
 # Code below is adapted from
 # https://stackoverflow.com/questions/40216311/reading-in-environment-variables-from-an-environment-file
 
